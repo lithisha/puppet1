@@ -1,0 +1,22 @@
+INSTALLED ='rpm -qa | grep php5'
+
+if ["$INSTALLED" ==  ""]; then
+	yum install php5
+fi
+
+
+
+if ["$OS == "Debian"]; then
+	INSTALLED= 'dpkg -l | grep php5'
+	COMMAND='apt-get install'
+
+else 
+  INSTALLED='rpm -qa | grep php5'
+  COMMAND= 'yum install'
+
+fi 
+if ["$INSTALLED" == ""]; then
+    $COMMAND php5
+
+fi
+
