@@ -1,0 +1,200 @@
+ 
+Lab 03
+ 
+ 
+Laboratory Exercise
+ 
+LAB EXERCISE
+ 
+Time to Complete 
+Approximately 45 Minutes
+
+What You Need 
+●	In this lab you will learn about 
+
+From your machine logged-in to RP VPN, run Remote Desktop Connection to connect to the ubuntu Linux Virtual Machine (VM). Please login based on your assigned VM as shown below:
+
+
+S/N	VM	IP Address	User Name	Password
+0	PDC2-Ubuntu-01	172.20.113.182	dockeradm	docker!2
+1	PDC2-Ubuntu-02	172.20.113.183	dockeradm	docker!2
+2	PDC2-Ubuntu-03	172.20.113.184	dockeradm	docker!2
+3	PDC2-Ubuntu-04	172.20.113.185	dockeradm	docker!2
+4	PDC2-Ubuntu-05	172.20.113.186	dockeradm	docker!2
+5	PDC2-Ubuntu-06	172.20.113.187	dockeradm	docker!2
+6	PDC2-Ubuntu-07	172.20.113.188	dockeradm	docker!2
+7	PDC2-Ubuntu-08	172.20.113.189	dockeradm	docker!2
+8	PDC2-Ubuntu-09	172.20.113.190	dockeradm	docker!2
+9	PDC2-Ubuntu-10	172.20.113.191	dockeradm	docker!2
+10	PDC2-Ubuntu-11	172.20.113.192	dockeradm	docker!2
+11	PDC2-Ubuntu-12	172.20.113.193	dockeradm	docker!2
+12	PDC2-Ubuntu-13	172.20.113.194	dockeradm	docker!2
+13	PDC2-Ubuntu-14	172.20.113.195	dockeradm	docker!2
+14	PDC2-Ubuntu-15	172.20.113.196	dockeradm	docker!2
+15	PDC2-Ubuntu-16	172.20.113.197	dockeradm	docker!2
+16	PDC2-Ubuntu-17	172.20.113.198	dockeradm	docker!2
+17	PDC2-Ubuntu-18	172.20.113.199	dockeradm	docker!2
+18	PDC2-Ubuntu-19	172.20.113.200	dockeradm	docker!2
+19	PDC2-Ubuntu-20	172.20.113.201	dockeradm	docker!2
+20	PDC2-Ubuntu-21	172.20.113.202	dockeradm	docker!2
+
+ 
+
+Replace xx with the IP address of the VM that you have been assigned.
+
+ 
+Part 1: Using EPP templates
+
+The main objective in this part of the lab is to create an EPP template to be used with a manifest.
+
+
+In Puppet 3.5 and later versions, EPP templates are a new functionality. 
+
+EPP templates have a similar syntax to ERB templates, however they are not compiled with Ruby. 
+
+EPP templates are called using two new functions: epp and inline epp. The EPP equivalents of the ERB functions template and inline template are template and inline template, respectively. The key distinction is that variables in EPP templates are addressed using the Puppet notation, $variable rather than @variable.
+
+
+Steps/Hints: 
+
+1.	Create an EPP template in /home/dockeradm/puppet/manifests/epp-test.epp with the following content:
+
+ 
+
+2.	Create an /home/dockeradm/puppet/manifests/epp.pp manifest, which uses the epp and inline_epp functions:
+
+ 
+
+3.	Apply the manifest.
+# puppet apply epp.pp
+
+<Insert screen capture of results>
+
+
+4.	Verify that the template worked as intended.
+
+# cat /tmp/epp-test
+
+<Insert screen capture of results>
+
+
+
+Part 2: Creating a Simple Embedded Puppet (EPP) Template for the MOTD File
+
+The main objective in this part of the lab is to create a simple EPP template for the MOTD file.
+
+Steps/Hints: 
+
+5.	Create an EPP template in /home/dockeradm/puppet/manifests/epp-test.epp with the following content:
+
+ 
+
+Test the template via command line. 
+# puppet epp render motd.epp
+
+<Insert screen capture of results>
+
+
+
+ 
+Part 3: Using Templates within the Chrony Module
+
+The main objective in this part of the lab is to create an EPP template within the Chrony module.
+
+6.	Navigate to the following path.
+# cd /etc/puppetlabs/code/environments/production/modules
+# pwd
+
+<Insert screen capture of results>
+
+
+7.	Create a new folder chrony (/etc/puppetlabs/code/environments/production/modules/chrony) and navigate into the folder.
+
+# mkdir chrony
+# cd chrony
+
+<Insert screen capture of results>
+
+
+8.	Create THREE (3) folders under this path using mkdir command.
+i)	files (/etc/puppetlabs/code/environments/production/modules/chrony/files)
+ii)	manifests (/etc/puppetlabs/code/environments/production/modules/chrony/manifests)
+iii)	templates (/etc/puppetlabs/code/environments/production/modules/chrony/templates)
+
+<Insert screen capture of results>
+
+
+9.	Create a file /etc/puppetlabs/code/environments/production/modules/chrony/files/chrony.conf with the following content:
+This shows a sample configuration file for the chronyd service for fast and accurate time synchronisation. 
+
+ 
+
+
+10.	Copy the chrony.conf to create a new epp template file /etc/puppetlabs/code/environments/production/modules/chrony/templates/chrony.epp using the cp command.
+
+<Insert screen capture of results>
+
+
+11.	Currently the template chrony.epp is giving us a static uk.pool.ntp.org server.
+
+ 
+
+12.	To embed more logic and real power to this template, to set different servers for different time zones. Modify the chrony.epp file as shown below.
+
+ 
+
+
+13.	Render the chrony.epp file.
+
+# puppet epp render chrony.epp
+
+<Insert screen capture of results>
+
+
+14.	Test if the template is working by setting the time zone to America/Denver and render the chrony.epp file again.
+
+# timedatectl set-timezone America/Denver
+# puppet epp render chrony.epp
+
+Verify that the server shown is us.pool.ntp.org.
+
+<Insert screen capture of results>
+
+
+15.	Set the time zone to Europe/London and render the chrony.epp file again
+
+# timedatectl set-timezone Europe/London
+# puppet epp render chrony.epp
+
+Verify that the server shown is uk.pool.ntp.org.
+
+<Insert screen capture of results>
+
+
+Do it yourself 
+
+16.	Modify the chrony.epp file to set server to sg.pool.ntp.org if the time zone is set to Singapore.
+
+<Insert screen capture of results>
+
+
+
+ 
+References
+•	Puppet Cookbook - Third Edition By Thomas Uphill, John Arundel
+•	Puppet 6 Essentials By Andrew Mallett
+
+
+
+
+
+
+
+
+
+
+
+
+--End of Lab Exercise --
+
+
