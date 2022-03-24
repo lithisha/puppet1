@@ -36,7 +36,7 @@ S/N	Name 	VM	IP Address	User Name	Password
 20	TAN TEE BING	PDC2-Ubuntu-21	172.20.113.202	dockeradm	docker!2
 
 
- 
+ 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
 
 Replace xx with the IP address of the VM that you have been assigned.
 
