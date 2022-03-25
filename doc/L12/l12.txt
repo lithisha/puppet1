@@ -1,0 +1,319 @@
+ 
+Lab 12
+ 
+ 
+Laboratory Exercise
+ 
+ 
+
+Part 1: Nagios Installation 
+
+If you have completed Part 1 of Lab 11, please skip Steps 1 to 10 and start from Step 11 straightaway as you would have already done those steps.  Otherwise, you can skip Part 1 of Lab 11 and proceed with this lab exercise from Step 1.
+ 
+LAB EXERCISE
+ 
+This lab will cover Nagios Core installation and setup (including web interface and default plugins) up to visualizing the initial web dashboard.
+
+Time to Complete 
+Approximately 60 Minutes 
+
+What You Need 
+You’ll need an installed Ubuntu 18.04 system for this tutorial.
+
+Virtual Machines
+1. 	From your machine logged-in to RP VPN, run Remote Desktop Connection to connect to your ubuntu Linux Virtual Machine (VM) from Lesson 10. Please login based on your assigned VM as shown below:
+S/N	Name 	VM	IP Address	User Name	Password
+1	LEOW TANG QING	PDC2-Ubuntu-03	172.20.113.184	dockeradm	docker!2
+2	LIM SHEN HUI	PDC2-Ubuntu-02	172.20.113.183	dockeradm	docker!2
+3	LIN JINGZHOU	PDC2-Ubuntu-04	172.20.113.185	dockeradm	docker!2
+4	MUHAMMAD FAISAL BIN SHAIK HASSAN	PDC2-Ubuntu-05	172.20.113.186	dockeradm	docker!2
+5	LYNN LEE QING XIA	PDC2-Ubuntu-06	172.20.113.187	dockeradm	docker!2
+6	NG CHEE KIONG	PDC2-Ubuntu-07	172.20.113.188	dockeradm	docker!2
+7	PARAMASIVAM S/O VANNU GOPAL	PDC2-Ubuntu-08	172.20.113.189	dockeradm	docker!2
+8	SAHLATUL-FARIHAH BINTE M ASARI	PDC2-Ubuntu-09	172.20.113.190	dockeradm	docker!2
+9	SHAIKH FAID BIN OMAR	PDC2-Ubuntu-10	172.20.113.191	dockeradm	docker!2
+10	CHIU JING XIONG	PDC2-Ubuntu-11	172.20.113.192	dockeradm	docker!2
+11	KELLY WONG XUE YEE	PDC2-Ubuntu-12	172.20.113.193	dockeradm	docker!2
+12	LIM SI YING	PDC2-Ubuntu-01	172.20.113.182	dockeradm	docker!2
+13	LIN LI YI	PDC2-Ubuntu-14	172.20.113.195	dockeradm	docker!2
+14	MUHAMMAD MUQTADIR BIN SADIQ BASHA	PDC2-Ubuntu-15	172.20.113.196	dockeradm	docker!2
+15	NUR HIDAYAH BTE RAMLEE	PDC2-Ubuntu-16	172.20.113.197	dockeradm	docker!2
+16	NUR NADIA ASHBOLLAH BINTE	PDC2-Ubuntu-17	172.20.113.198	dockeradm	docker!2
+17	NUR THAQIFAH AQILAH BINTE JURAIMI	PDC2-Ubuntu-18	172.20.113.199	dockeradm	docker!2
+18	RAUDHATUNNISHA BTE RAMLI	PDC2-Ubuntu-19	172.20.113.200	dockeradm	docker!2
+19	SITI NUR ALYSHYIA BINTE HASHIM	PDC2-Ubuntu-20	172.20.113.201	dockeradm	docker!2
+20	TAN TEE BING	PDC2-Ubuntu-21	172.20.113.202	dockeradm	docker!2
+
+ 
+
+Replace xx with the IP address of the VM that you have been assigned.
+
+First time login
+1.	Launch a terminal and check your ubuntu version:
+lsb_release -a
+
+ 
+
+Update the repositories
+2.	The first step is to update the repositories. Updating the packages will download the list of packages with their latest version:
+
+sudo apt update
+
+Install the LAMP stack
+3.	Before installing the Nagios tool, it’s important to install the LAMP stack. LAMP is a collection of Linux Apache MariaDB and Python/PHP/Perl which is used for dynamic websites:
+
+sudo apt-get install -y autoconf gcc libc6 make wget unzip apache2 php libapache2-mod-php7.2 libgd-dev
+
+4. 	Check your Apache status:
+	sudo systemctl status apache2
+
+<Insert screen capture of results>
+
+
+
+
+5.	You can download the latest Nagios core from: https://www.nagios.org/downloads/
+
+6.	Or use this embedded file (right-click, copy and paste into your ubuntu): 
+ 
+
+7.	Save the file into your /tmp directory and extract it: 
+
+	cd /tmp
+	tar xzf nagioscore.tar.gz
+
+Compile the package
+8.	To install Nagios on Ubuntu after downloading and extracting the tarball, we need to compile the package. Change the current directory to the Nagios directory and run the configure script. The configure script is used to check whether all the dependencies are present in the system or not. Let’s have a look at the command below:
+
+
+	cd /tmp/nagioscore-nagios-4.4.5/
+sudo ./configure --with-httpd-conf=/etc/apache2/sites-enabled
+ 
+
+9.	The next step is to build nagios using the make command. Type the following in the terminal:
+
+	sudo make all
+
+ 
+
+Create a group and a user
+10.	We need to create a group and a user for Nagios. Create the Nagios user account and add it to the group:
+
+	sudo useradd nagios
+sudo groupadd nagios
+
+Once the group and user is created, add the www-data user to the nagios group so we can run Nagios and access the application from the webserver.
+	sudo usermod -a -G nagios www-data
+
+Install the Binary files
+11.	After successfully creating the binary files, the next step is to install the binary files, CGIs, and HTML files. Let’s have a look at the command below:
+	sudo make install
+ 
+
+Create the systemd unit file
+12.	Next, we have to install the daemon/service files that would configure the Nagios on start on boot. This command also creates a systemd unit file.
+Let’s have a look at the command below:
+	sudo make install-daemoninit
+  
+
+Install the external command file
+12.	As of now, we have installed the daemon service, the next step is to install the external command file. It will also configure the external directory. Use make install command to do so. Let’s have a look at the command below:
+	sudo make install-commandmode
+  
+
+Install configuration files
+13.	There are many configuration files you need to install in the system. The next step is to install the Nagios configuration file. Let’s have a look at the command below:
+	sudo make install-config
+  
+
+Install Apache configuration files
+14.	As we are using the LAMP stack, therefore we have to install the Apache configuration file. Note that, make sure the Apache rewrite and CGI are enabled. Let’s have a look at the command below:
+	sudo make install-webconf
+  
+
+If the Apache rewrite and CGI is not enabled, use the following command to do so.
+
+	sudo a2enmod rewrite
+sudo a2enmod cgi
+  
+
+Firewall configuration
+15.	The next step is to configure the firewall i.e. allow the port 80 so that you can access the Nagios web interface. Use the ufw command to do so. Let’s have a look at the following command:
+
+
+
+
+
+	sudo ufw allow 'Apache'
+sudo ufw reload
+ 
+OR
+sudo ufw allow 80/tcp
+sudo ufw reload
+Either of the commands will open the port 80 for us.
+How to Secure Nagios Installation?
+16.	All of us are concerned about security issues. Therefore, it’s important to secure the Nagios account with password to make it accessible only to authorized users. Use the htpasswd command to secure it.
+Let’s have a look at the command below:
+	sudo htpasswd -c /usr/local/nagios/etc/htpasswd.users nagiosadmin
+
+This command would create an account named nagiosadmin and will allow us to set up a password. Add the password as shown in the image given below:
+ 
+
+17.	Add Password for Nagios: Add a strong password.
+
+Restart the Apache service
+18.	As we did some changes in the Apache configuration, therefore we have to restart the Apache service again. Use the restart command to restart the service. You can use status command to verify the status of the service.
+Let’s have a look at the command below:
+
+	sudo systemctl restart apache2.service
+sudo systemctl status apache2.service
+
+Starting Nagios and Installing Plugins
+19.	Now that we know how to install Nagios on Ubuntu, let’s begin with Nagios. The systemctl command is used to start the Nagios service. Let’s have a look at the command below:
+	sudo systemctl start nagios.service
+
+20.	The status command is used to verify the status of the service. To do so, type the following in the terminal:
+	sudo systemctl status nagios.service
+ Status 
+
+You can see the status as active highlighted in the above image.
+Install the Nagios plugins
+21.	Earlier we discussed that it is important to install the Nagios plugin to interact with the host computer. These are the executable files. Therefore, download the latest version of the plugin. It will be downloaded in the tar file, extract it later using tar command. Do change the directory to tmp folder. Use the wget command to install the plugins.
+Let’s have a look at the command below:
+
+	cd /tmp
+
+wget --no-check-certificate -O nagios-plugins.tar.gz https://github.com/nagios-plugins/nagios-plugins/archive/release-2.2.1.tar.gz
+
+22.	Extract the archive using tar command. To do so, type the following in the terminal
+	tar zxf nagios-plugins.tar.gz
+
+Compile the plugins
+22.	As we did compile the Nagios core software, similarly we have to compile and install the Nagios plugins. The commands are the same as we used before. Make sure to change the directory using the cd command.
+Let’s have a look at the command below to set up the plugins.
+
+	cd /tmp/nagios-plugins-release-2.2.1/
+sudo ./tools/setup
+  
+
+23.	The next step is to run the configure command to configure the plugins. To do so, type the following in the terminal.
+	sudo ./configure
+
+Install the plugins
+24.	After compiling the configuration files, the next step is to install the plugins. Use the make command to do so. Let’s have a look at the command below:
+	sudo make
+ Make Instakk 
+
+
+25.	The last step is to run the make install command. Let’s have a look below:
+	sudo make install
+  
+
+26.	Make sure to start the service again using start command as we did before.
+
+How to View the Nagios Web Interface
+
+27.	That’s it. We now know how to install Nagios on Ubuntu along with the plugins. Let’s begin with the web interface. Mention your server IP address or domain name followed by the nagios. Let’s have a look at the command below:
+	http://IP_ADDRESS/nagios
+
+
+<Insert screen capture of results>
+
+
+
+
+
+________________________________________
+
+Monitored Clients
+
+Part 2: Install Additional Clients to be monitored
+ 
+LAB EXERCISE
+ 
+This lab will cover the installation of additional client containers.
+
+Time to Complete 
+Approximately 20 Minutes 
+
+What You Need 
+You will need to refresh and reuse your Docker container commands from Lesson 6.
+
+Client Containers
+1.	For the first client container, you shall install a Docker container with Apache web server.
+
+2.	For the second client container, you shall install a Docker container with Postgres database.
+
+3.	Record all the commands that you have used here:
+
+<Your commands to create client containers>
+
+
+4.	Check your Docker container status and information, and paste a screenshot here:
+
+<Insert screen capture of your Docker status>
+
+
+________________________________________
+
+Monitored Clients
+
+Part 3: Install and Configure SSH
+ 
+LAB EXERCISE
+ 
+This lab will cover the installation and configuration of SSH.
+
+Time to Complete 
+Approximately 15 Minutes 
+
+What You Need 
+You will need to have your client containers up and running.
+
+SSH Installation and Configuration
+1.	Follow either of these links to install and configure openssh-server package on your client containers:
+a.	https://linuxize.com/post/how-to-enable-ssh-on-ubuntu-18-04/
+b.	https://linuxhint.com/enable_ssh_server_ubuntu_1804/
+
+
+2.	Next, follow either of these links to implement password-less SSH login to both your client containers:
+a.	https://websiteforstudents.com/how-to-setup-ssh-key-login-on-ubuntu-linux/
+b.	https://www.linuxbabe.com/linux-server/setup-passwordless-ssh-login
+
+Commands:
+	sudo apt install openssh-server
+	sudo systemctl status ssh
+	sudo ufw allow ssh
+	ip a
+	ssh username@ip_address
+	sudo systemctl stop ssh
+	sudo systemctl start ssh
+	sudo systemctl disable ssh
+	sudo systemctl enable ssh
+	ssh-keygen -t rsa -b 4096 -C "your_username@example.com"
+	ssh-copy-id username@server_ip_address
+	sudo nano /etc/ssh/sshd_config
+   add/change-> PasswordAuthentication no
+   add/change-> ChallengeResponseAuthentication no
+   add/change-> UsePAM no
+	sudo systemctl restart ssh
+
+
+________________________________________
+
+Summary:
+●	Nagios Core software downloaded and compiled.
+●	Nagios Core software installed and ready.
+●	Nagios Plugins downloaded and compiled.
+●	Nagios Plugins installed and configured.
+●	Apache web server installed and running on Nagios server.
+●	Nagios web interface can be accessed.
+●	One Apache web server client container installed.
+●	One Postgres database client container installed.
+●	OpenSSH-server package installed on both client containers.
+●	Password-less SSH login configured.
+
+--End of Lab Exercise --
+
+
+
