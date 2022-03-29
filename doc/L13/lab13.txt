@@ -1,0 +1,113 @@
+ 
+Lab 13
+ 
+ 
+Laboratory Exercise
+ 
+ 
+
+Part 1: Monitored Clients 
+
+This should have been done in Lab 12. This section includes the commands to achieve it.
+ 
+LAB EXERCISE
+ 
+This lab will cover the installation of additional client containers.
+
+Time to Complete 
+Approximately 20 Minutes 
+
+What You Need 
+You will need to refresh and reuse your Docker container commands from Lesson 6.
+
+Client Containers
+1.	For the first client container, you shall install a Docker container with Apache web server.
+
+docker run -d --privileged -h "apacheweb.localdomain" --name apacheweb --add-host "sddo-vm.localdomain:172.20.113.93" --ip "192.168.100.11" -e TZ=SGT -p 8011:80 ubuntu/apache2:latest
+
+docker network connect --ip "192.168.100.11" customnetwork apacheweb
+
+docker exec --privileged -it apacheweb /bin/bash
+
+apt update
+apt install openssh-server
+
+2.	For the second client container, you shall install a Docker container with Postgres database.
+
+
+________________________________________
+
+Part 2: Install and Configure SSH
+ 
+LAB EXERCISE
+ 
+This lab will cover the installation and configuration of SSH.
+
+Time to Complete 
+Approximately 15 Minutes 
+
+What You Need 
+You will need to have your client containers up and running.
+
+SSH Installation and Configuration
+1.	Follow either of these links to install and configure openssh-server package on your client containers:
+a.	https://linuxize.com/post/how-to-enable-ssh-on-ubuntu-18-04/
+b.	https://linuxhint.com/enable_ssh_server_ubuntu_1804/
+
+
+2.	Next, follow either of these links to implement password-less SSH login to both your client containers:
+a.	https://websiteforstudents.com/how-to-setup-ssh-key-login-on-ubuntu-linux/
+b.	https://www.linuxbabe.com/linux-server/setup-passwordless-ssh-login
+
+Commands:
+	
+	sudo service ssh status
+	sudo service ssh restart
+	
+	ssh-keygen -t rsa -b 4096 -C "your_username@example.com"
+	ssh-copy-id username@server_ip_address
+	
+	sudo nano /etc/ssh/sshd_config
+   add/change-> PasswordAuthentication no
+   add/change-> ChallengeResponseAuthentication no
+   add/change-> UsePAM no
+	
+	sudo service ssh restart
+
+ 
+
+________________________________________
+
+Part 3: Nagios Configurations
+ 
+LAB EXERCISE
+ 
+This lab will cover the configuration of Nagios monitoring.
+
+Time to Complete 
+Approximately 30 Minutes 
+
+What You Need 
+You will need to refer to the lecture notes (PowerPoint file) for Lesson 13.
+
+Nagios Configuration
+1.	Refer to the slides and configure Hosts, Services, Commands, Contacts, Time Periods, Host group, and Service group.
+
+
+________________________________________
+
+Summary:
+●	Nagios Core software downloaded and compiled.
+●	Nagios Core software installed and ready.
+●	Nagios Plugins downloaded and compiled.
+●	Nagios Plugins installed and configured.
+●	Apache web server installed and running on Nagios server.
+●	Nagios web interface can be accessed.
+●	One Apache web server client container installed.
+●	One Postgres database client container installed.
+●	OpenSSH-server package installed on both client containers.
+●	Password-less SSH login configured.
+
+--End of Lab Exercise --
+
+
