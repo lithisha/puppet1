@@ -27,14 +27,14 @@ docker run -d --privileged -h "apacheweb.localdomain" --name apacheweb --add-hos
 
 docker network connect --ip "192.168.100.11" customnetwork apacheweb
 
-docker exec --privileged -it apacheweb /bin/bash
+docker exec --privileged -it postgresdb /bin/bash
 
 apt update
 apt install openssh-server
 
 2.	For the second client container, you shall install a Docker container with Postgres database.
-
-
+docker run -d --privileged -h "postgresdb.localdomain" --name postgresdb --add-host "puppetserver.dv1c04-210123456.com:192.168.1.6" --ip "192.168.100.12" -e TZ=SGT -p 8011:80 -e POSTGRES_PASSWORD=21050832 -d postgres
+docker run --name nagiospostgres -e POSTGRES_PASSWORD=mysecretpassword -d postgres
 ________________________________________
 
 Part 2: Install and Configure SSH
