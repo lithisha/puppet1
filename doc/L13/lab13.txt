@@ -65,7 +65,10 @@ Commands:
 	sudo service ssh restart
 	
 	ssh-keygen -t rsa -b 4096 -C "your_username@example.com"
+	
+	ssh-keygen -t rsa -b 4096 -C "root@192.168.100.11"
 	ssh-copy-id username@server_ip_address
+	ssh-copy-id "root@192.168.100.11"
 	
 	sudo nano /etc/ssh/sshd_config
    add/change-> PasswordAuthentication no
