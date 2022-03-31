@@ -1,0 +1,205 @@
+ 
+Lab 14
+ 
+ 
+Laboratory Exercise
+ 
+ 
+
+Part 1: Nagios Local Monitoring 
+
+LAB EXERCISE
+ 
+This lab will cover the configuration of Nagios for local monitoring.
+
+Time to Complete 
+Approximately 30 Minutes 
+
+What You Need 
+You will need to have completed the following from Labs 11 to 13:
+●	Nagios Core software downloaded and compiled.
+●	Nagios Core software installed and ready.
+●	Nagios Plugins downloaded and compiled.
+●	Nagios Plugins installed and configured.
+●	Apache web server installed and running on Nagios server.
+●	Nagios web interface can be accessed.
+●	One Apache web server client container installed and running.
+●	One Postgres database client container installed and running.
+
+Monitoring Apache Web Container
+1.	Login to your Nagios Server and execute the command/s below.
+
+dockeradm@sddo-vm: cd /usr/local/nagios/etc/objects
+
+2.	Edit the “localhost.cfg” file using any of these commands:
+
+dockeradm@sddo-vm: gedit localhost.cfg
+dockeradm@sddo-vm: nano localhost.cfg
+dockeradm@sddo-vm: vi localhost.cfg
+
+3.	Add these lines to the “localhost.cfg” file, and save the file:
+
+
+define host {
+    use		linux-server
+    host_name	apacheweb
+    alias		apacheweb.localdomain
+    address		192.168.100.11
+}
+
+4.	Exit to your Nagios Server system prompt and execute the command/s below.
+
+dockeradm@sddo-vm: systemctl restart nagios.service
+
+5.	Launch your web browser and access the Nagios web interface.  Paste a screenshot of what you have observed as a result of the above configuration.
+
+<Insert screen capture of results>
+
+6.	Edit the “localhost.cfg” file again using any of these commands:
+
+dockeradm@sddo-vm: gedit localhost.cfg
+dockeradm@sddo-vm: nano localhost.cfg
+dockeradm@sddo-vm: vi localhost.cfg
+
+7.	Add these lines to the “localhost.cfg” file, and save the file:
+
+define service {
+    use			local-service
+    host_name		apacheweb
+    service_description	PING
+    check_command	check_ping!100.0,20%!500.0,60%
+}
+
+define service {
+    use			local-service
+    host_name		apacheweb
+    service_description	SSH
+    check_command	check_ssh
+    notifications_enabled	0
+}
+
+ 
+define service {
+    use			local-service
+    host_name		apacheweb
+    service_description	HTTP
+    check_command	check_http
+    notifications_enabled	0
+}
+
+define service {
+    use			local-service
+    host_name		apacheweb
+    service_description	Current Users
+    check_command	check_local_users!20!50
+}
+
+define service {
+    use			local-service
+    host_name		apacheweb
+    service_description	Current Load
+    check_command	check_local_load!5.0,4.0,3.0!10.0,6.0,4.0
+}
+
+8.	Exit to your Nagios Server system prompt and execute the command/s below.
+
+dockeradm@sddo-vm: systemctl restart nagios.service
+
+9.	Launch your web browser and access the Nagios web interface.  Paste a screenshot of what you have observed as a result of the above configuration.
+
+<Insert screen capture of results>
+
+10.	Edit the “localhost.cfg” file using any of these commands:
+
+dockeradm@sddo-vm: gedit localhost.cfg
+dockeradm@sddo-vm: nano localhost.cfg
+dockeradm@sddo-vm: vi localhost.cfg
+
+11.	Amend these lines in the “localhost.cfg” file, and save the file:
+
+define hostgroup {
+    hostgroup_name	linux-servers
+    members		localhost,apacheweb
+}
+
+12.	Exit to your Nagios Server system prompt and execute the command/s below.
+
+dockeradm@sddo-vm: systemctl restart nagios.service
+
+13.	Launch your web browser and access the Nagios web interface.  Paste a screenshot of what you have observed as a result of the above configuration.
+
+<Insert screen capture of results>
+
+________________________________________
+
+Monitoring Postgres Database Container
+14.	Repeat all the above steps for monitoring Apache Web Container, except to change these values:
+
+    host_name	postgresdb
+    alias		postgresdb.localdomain
+    address		192.168.100.12
+
+________________________________________
+
+Part 2: Nagios Remote Monitoring 
+
+LAB EXERCISE
+ 
+This lab will cover the configuration of Nagios for remote monitoring.
+
+Time to Complete 
+Approximately 30 Minutes 
+
+What You Need 
+You will need to have completed the following from Labs 11 to 13:
+●	Nagios Core software installed and ready.
+●	Nagios Plugins installed and configured.
+●	Apache web server installed and running on Nagios server.
+●	Nagios web interface can be accessed.
+●	One Apache web server client container installed and running.
+●	One Postgres database client container installed and running.
+●	OpenSSH-server package installed on both client containers.
+●	Password-less SSH login configured.
+
+
+Monitoring Apache Web Container
+1.	Login to your Apache Web Container and execute the command/s below.
+
+root@apacheweb: docker exec --privileged -it apacheweb /bin/bash
+root@apacheweb: adduser nagios
+
+2.	Login to your Nagios Server and execute the command/s below.
+
+dockeradm@sddo-vm: ssh-keygen -t rsa -b 4096 -C "your_username@example.com"
+dockeradm@sddo-vm: ssh-copy-id nagios@192.168.100.11
+
+3.	Edit the “commands.cfg” file using any of these commands:
+
+dockeradm@sddo-vm: gedit commands.cfg
+dockeradm@sddo-vm: nano commands.cfg
+dockeradm@sddo-vm: vi commands.cfg
+
+4.	Add these lines to the “commands.cfg” file, and save the file:
+
+define command {
+    command_name	check_remote_load
+    command_line		/usr/bin/ssh $HOSTADDRESS$ $USER1$/check_load -w $ARG1$ -c $ARG2$
+}
+
+5.	Update the host and service definitions in the “localhost.cfg” file, and save the file. 
+
+6.	Exit to your Nagios Server system prompt and execute the command/s below.
+
+dockeradm@sddo-vm: systemctl restart nagios.service
+
+7.	Launch your web browser and access the Nagios web interface.  Paste a screenshot of what you have observed as a result of the above configuration.
+
+<Insert screen capture of results>
+
+________________________________________
+
+Monitoring Postgres Database Container
+8.	Repeat all the above steps for monitoring Apache Web Container.
+
+--End of Lab Exercise --
+
